@@ -1,0 +1,44 @@
+<div class="card" *ngIf="!analysis.trainable">
+  <h2>Comparação de modelos</h2>
+  <p class="hint">
+    Nenhum modelo foi treinado com este arquivo — {{ analysis.trainable_issue?.mensagem }}
+  </p>
+</div>
+
+<div class="card" *ngIf="analysis.trainable">
+  <h2>Comparação de modelos</h2>
+  <p>
+    Dois modelos são treinados com o mesmo split treino/teste (80/20 estratificado):
+    <strong>Regressão Logística</strong> (baseline interpretável) e <strong>Random Forest</strong>
+    (captura relações não lineares). O modelo é escolhido priorizando o <em>recall</em> da classe
+    maligna — em triagem, deixar de identificar um caso maligno (falso negativo) é mais grave que
+    encaminhar um caso benigno para investigação adicional.
+  </p>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Accuracy</th>
+          <th>Recall (maligno)</th>
+          <th>F1 (maligno)</th>
+          <th>ROC-AUC</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of analysis.models_comparison">
+          <td>{{ row.modelo }}</td>
+          <td>{{ row.accuracy }}</td>
+          <td>{{ row.recall_maligno }}</td>
+          <td>{{ row.f1_maligno }}</td>
+          <td>{{ row.roc_auc }}</td>
+          <td>
+            <span class="badge badge--best" *ngIf="row.modelo === analysis.best_model">Selecionado</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

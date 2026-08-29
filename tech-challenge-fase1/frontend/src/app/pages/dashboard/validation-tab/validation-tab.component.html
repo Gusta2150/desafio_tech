@@ -1,0 +1,59 @@
+<div class="card">
+  <h2>Status de compatibilidade do CSV</h2>
+  <span class="badge" [ngClass]="analysis.identificacao_csv.status === 'CSV compatível' ? 'badge--ok' : 'badge--danger'">
+    {{ analysis.identificacao_csv.status }}
+  </span>
+  <p>{{ analysis.identificacao_csv.mensagem }}</p>
+
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <div class="stat-tile__label">Domínio identificado</div>
+      <div class="stat-tile__value" style="font-size: 1.1rem;">
+        {{ analysis.identificacao_csv.dominio_identificado }}
+      </div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile__label">Amostras</div>
+      <div class="stat-tile__value">{{ analysis.identificacao_csv.amostras }}</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile__label">Atributos</div>
+      <div class="stat-tile__value">{{ analysis.identificacao_csv.atributos }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Distribuição do diagnóstico</h2>
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <div class="stat-tile__label">Benigno</div>
+      <div class="stat-tile__value">{{ analysis.eda.diagnosis_distribution.Benigno }}</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile__label">Maligno</div>
+      <div class="stat-tile__value">{{ analysis.eda.diagnosis_distribution.Maligno }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Valores ausentes por coluna</h2>
+  <p *ngIf="missingEntries.length === 0">Nenhum valor ausente encontrado nas colunas de atributos.</p>
+  <div class="table-scroll" *ngIf="missingEntries.length > 0">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Coluna</th>
+          <th>Valores ausentes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of missingEntries">
+          <td>{{ entry[0] }}</td>
+          <td>{{ entry[1] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

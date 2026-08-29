@@ -1,0 +1,47 @@
+<app-top-bar></app-top-bar>
+
+<div class="dashboard" *ngIf="analysis as data">
+  <header class="dashboard__header">
+    <div>
+      <h1>Resultado da análise</h1>
+      <p class="dashboard__subtitle">
+        {{ data.identificacao_csv.dominio_identificado }} · {{ data.identificacao_csv.amostras }} amostras ·
+        <ng-container *ngIf="data.trainable; else notTrainableSubtitle">
+          modelo selecionado: <strong>{{ data.best_model }}</strong>
+        </ng-container>
+        <ng-template #notTrainableSubtitle><strong>sem modelo treinado</strong></ng-template>
+      </p>
+    </div>
+    <button type="button" class="secondary" (click)="startOver()">Analisar outro CSV</button>
+  </header>
+
+  <app-clinical-disclaimer></app-clinical-disclaimer>
+
+  <div class="info-banner" *ngIf="!data.trainable && data.trainable_issue">
+    <span class="info-banner__icon" aria-hidden="true">ℹ️</span>
+    <div>
+      <p class="info-banner__title">{{ data.trainable_issue.status }}</p>
+      <p>{{ data.trainable_issue.mensagem }}</p>
+    </div>
+  </div>
+
+  <nav class="dashboard__tabs">
+    <button
+      *ngFor="let tab of tabs"
+      type="button"
+      [class.active]="activeTab === tab.id"
+      (click)="selectTab(tab.id)"
+    >
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <section class="dashboard__content">
+    <app-validation-tab *ngIf="activeTab === 'validation'" [analysis]="data"></app-validation-tab>
+    <app-eda-tab *ngIf="activeTab === 'eda'" [analysis]="data"></app-eda-tab>
+    <app-modeling-tab *ngIf="activeTab === 'modeling'" [analysis]="data"></app-modeling-tab>
+    <app-evaluation-tab *ngIf="activeTab === 'evaluation'" [analysis]="data"></app-evaluation-tab>
+    <app-explainability-tab *ngIf="activeTab === 'explainability'" [analysis]="data"></app-explainability-tab>
+    <app-predict-tab *ngIf="activeTab === 'predict'" [analysis]="data"></app-predict-tab>
+  </section>
+</div>

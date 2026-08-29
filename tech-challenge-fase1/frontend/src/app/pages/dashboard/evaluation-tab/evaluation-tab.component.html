@@ -1,0 +1,83 @@
+<div class="card" *ngIf="!analysis.trainable">
+  <h2>Avaliação do modelo</h2>
+  <p class="hint">
+    Nenhum modelo foi treinado com este arquivo — {{ analysis.trainable_issue?.mensagem }}
+  </p>
+</div>
+
+<ng-container *ngIf="analysis.trainable">
+  <div class="card">
+    <h2>Relatório de classificação — {{ analysis.best_model }}</h2>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Classe</th>
+            <th>Precisão</th>
+            <th>Recall</th>
+            <th>F1-score</th>
+            <th>Suporte</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Benigno</td>
+            <td>{{ analysis.evaluation.classification_report?.Benigno?.precision?.toFixed(3) }}</td>
+            <td>{{ analysis.evaluation.classification_report?.Benigno?.recall?.toFixed(3) }}</td>
+            <td>{{ analysis.evaluation.classification_report?.Benigno?.['f1-score']?.toFixed(3) }}</td>
+            <td>{{ analysis.evaluation.classification_report?.Benigno?.support }}</td>
+          </tr>
+          <tr>
+            <td>Maligno</td>
+            <td>{{ analysis.evaluation.classification_report?.Maligno?.precision?.toFixed(3) }}</td>
+            <td>{{ analysis.evaluation.classification_report?.Maligno?.recall?.toFixed(3) }}</td>
+            <td>{{ analysis.evaluation.classification_report?.Maligno?.['f1-score']?.toFixed(3) }}</td>
+            <td>{{ analysis.evaluation.classification_report?.Maligno?.support }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">
+      Accuracy geral: {{ analysis.evaluation.classification_report?.accuracy?.toFixed(3) }} · ROC-AUC:
+      {{ analysis.evaluation.roc_auc }}
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Matriz de confusão</h2>
+    <table class="confusion-matrix">
+      <thead>
+        <tr>
+          <th></th>
+          <th colspan="2">Previsto</th>
+        </tr>
+        <tr>
+          <th></th>
+          <th *ngFor="let label of confusionLabels">{{ label }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of confusionMatrix; let i = index">
+          <th>Real {{ confusionLabels[i] }}</th>
+          <td
+            *ngFor="let value of row; let j = index"
+            [class.diagonal]="i === j"
+            [class.error-cell]="i !== j && value > 0"
+          >
+            {{ value }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="hint">
+      Diagonal = acertos. Fora da diagonal = erros (falso positivo/falso negativo) — o número de
+      falsos negativos (caso maligno previsto como benigno) é o dado mais crítico para a discussão
+      clínica deste projeto.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Curva ROC</h2>
+    <canvas baseChart [data]="rocChartData" [options]="rocOptions" type="line"></canvas>
+  </div>
+</ng-container>

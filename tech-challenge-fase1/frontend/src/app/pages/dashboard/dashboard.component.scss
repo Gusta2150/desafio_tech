@@ -1,0 +1,67 @@
+.dashboard {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0 0 0.3rem;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+
+    strong {
+      color: var(--text-primary);
+    }
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.35rem;
+    margin-bottom: 1.5rem;
+
+    button {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+
+      &:not(:disabled):hover {
+        transform: none;
+        box-shadow: none;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+
+      &.active {
+        background: linear-gradient(135deg, var(--accent), var(--accent-active));
+        color: #fff;
+      }
+    }
+  }
+
+  &__content {
+    min-height: 300px;
+  }
+}

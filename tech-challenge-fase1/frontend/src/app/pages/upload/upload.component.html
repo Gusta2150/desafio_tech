@@ -1,0 +1,121 @@
+<app-top-bar></app-top-bar>
+
+<div class="upload-page">
+  <header class="upload-page__header">
+    <h1>Apoio ao diagnóstico de câncer de mama</h1>
+    <p>Envie um CSV de medidas morfológicas para rodar o pipeline completo: validação, EDA, modelagem, avaliação e explicabilidade.</p>
+  </header>
+
+  <app-clinical-disclaimer></app-clinical-disclaimer>
+
+  <section class="upload-card">
+    <h2>1. Escolha a base de dados</h2>
+    <p class="upload-card__hint">
+      O CSV precisa ter a coluna <code>diagnosis</code> (M/B, malignant/benign ou
+      maligno/benigno) e as medidas morfológicas do dataset Breast Cancer Wisconsin
+      (raio, textura, perímetro, área, concavidade etc.).
+    </p>
+
+    <div
+      class="dropzone"
+      [class.dropzone--active]="isDragging"
+      [class.dropzone--filled]="selectedFile"
+      [class.dropzone--disabled]="loading"
+      (click)="fileInput.click()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event, fileInput)"
+    >
+      <input
+        #fileInput
+        type="file"
+        accept=".csv"
+        class="dropzone__input"
+        (change)="onFileSelected($event)"
+        [disabled]="loading"
+      />
+
+      <ng-container *ngIf="!selectedFile; else fileChip">
+        <span class="dropzone__icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 16V4m0 0L7 9m5-5 5 5M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <p class="dropzone__title">Arraste seu CSV aqui</p>
+        <p class="dropzone__subtitle">ou clique para escolher um arquivo do computador</p>
+      </ng-container>
+
+      <ng-template #fileChip>
+        <div class="file-chip" (click)="$event.stopPropagation()">
+          <span class="file-chip__icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <path d="M14 2v6h6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="file-chip__info">
+            <span class="file-chip__name">{{ selectedFile?.name }}</span>
+            <span class="file-chip__size">{{ formatFileSize(selectedFile?.size ?? 0) }}</span>
+          </span>
+          <button
+            type="button"
+            class="file-chip__remove"
+            (click)="clearFile(fileInput)"
+            [disabled]="loading"
+            aria-label="Remover arquivo"
+          >
+            ✕
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="upload-card__row">
+      <button type="button" (click)="runWithUploadedFile()" [disabled]="loading || !selectedFile">
+        <span *ngIf="!loading">Analisar arquivo enviado</span>
+        <span *ngIf="loading" class="spinner-label"><span class="spinner"></span> Processando...</span>
+      </button>
+    </div>
+
+    <div class="upload-card__divider">ou</div>
+
+    <button type="button" class="secondary" (click)="runWithDefaultDataset()" [disabled]="loading">
+      Usar o dataset padrão do projeto (data.csv)
+    </button>
+
+    <p *ngIf="loading" class="upload-card__status">
+      Rodando validação, EDA, treino, avaliação e explicabilidade... isso pode levar alguns segundos.
+    </p>
+    <p *ngIf="errorMessage" class="upload-card__error">{{ errorMessage }}</p>
+  </section>
+
+  <section class="card incompatible-card" *ngIf="incompatible">
+    <span class="badge badge--danger">{{ incompatible.status }}</span>
+    <h2>{{ incompatible.dominio_identificado || 'Domínio não identificado' }}</h2>
+    <p>{{ incompatible.mensagem }}</p>
+
+    <div *ngIf="incompatible.campos_ausentes as fields" class="incompatible-card__technical">
+      <p class="hint">Colunas técnicas que faltam no arquivo:</p>
+      <ul class="incompatible-card__fields">
+        <li *ngFor="let field of fields"><code>{{ field }}</code></li>
+      </ul>
+    </div>
+
+    <p class="hint">
+      Isso é esperado: este sistema só analisa exames de câncer de mama. Para
+      continuar, envie um arquivo com esses dados ou use o dataset padrão do
+      projeto acima.
+    </p>
+  </section>
+</div>

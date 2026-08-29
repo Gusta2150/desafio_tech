@@ -1,0 +1,28 @@
+<div class="card" *ngIf="!analysis.trainable">
+  <h2>Explicabilidade</h2>
+  <p class="hint">
+    Nenhum modelo foi treinado com este arquivo — {{ analysis.trainable_issue?.mensagem }}
+  </p>
+</div>
+
+<ng-container *ngIf="analysis.trainable">
+  <div class="card">
+    <h2>Importância por permutação</h2>
+    <p>
+      Mede quanto o <em>recall</em> cai quando os valores de cada atributo são embaralhados no
+      conjunto de teste. É agnóstica ao modelo e mostra associação preditiva, não causalidade.
+    </p>
+    <canvas baseChart [data]="permutationChartData" [options]="horizontalBarOptions" type="bar"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>SHAP — impacto médio absoluto</h2>
+    <ng-container *ngIf="hasShap; else noShap">
+      <p>Explicação local por atributo, para a classe maligna.</p>
+      <canvas baseChart [data]="shapChartData" [options]="horizontalBarOptions" type="bar"></canvas>
+    </ng-container>
+    <ng-template #noShap>
+      <p class="hint">{{ analysis.explainability.shap_error || 'SHAP não disponível para esta execução.' }}</p>
+    </ng-template>
+  </div>
+</ng-container>

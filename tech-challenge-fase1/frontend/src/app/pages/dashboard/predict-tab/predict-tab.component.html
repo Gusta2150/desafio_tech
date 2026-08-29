@@ -1,0 +1,85 @@
+<div class="card" *ngIf="!analysis.trainable">
+  <h2>Prever amostra</h2>
+  <p class="hint">
+    Este arquivo não treinou um modelo — {{ analysis.trainable_issue?.mensagem }}
+  </p>
+</div>
+
+<ng-container *ngIf="analysis.trainable">
+  <div class="card">
+    <h2>Previsão manual</h2>
+    <p class="hint">
+      Campos pré-preenchidos com a média de cada atributo na base analisada — ajuste os valores
+      para simular uma amostra e ver a orientação de triagem.
+    </p>
+
+    <form [formGroup]="manualForm" (ngSubmit)="submitManual()" class="manual-form">
+      <div class="manual-form__grid">
+        <label *ngFor="let feature of analysis.feature_names">
+          {{ feature }}
+          <input type="number" step="any" [formControlName]="feature" />
+        </label>
+      </div>
+      <button type="submit" [disabled]="manualLoading">
+        {{ manualLoading ? 'Calculando...' : 'Prever' }}
+      </button>
+    </form>
+
+    <p *ngIf="manualError" class="error">{{ manualError }}</p>
+
+    <div *ngIf="manualResult" class="result-box">
+      <span class="badge" [ngClass]="triageClass(manualResult)">{{ manualResult.orientacao }}</span>
+      <p>Probabilidade de malignidade: <strong>{{ (manualResult.probabilidade_malignidade * 100).toFixed(1) }}%</strong></p>
+      <p class="hint">{{ manualResult.aviso }}</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Previsão em lote (upload de CSV)</h2>
+    <p class="hint">
+      Envie um CSV com as mesmas colunas de atributos do treinamento (sem a coluna
+      <code>diagnosis</code>) para prever várias amostras de uma vez — equivalente ao fluxo
+      <code>nova_amostra.csv</code> do notebook.
+    </p>
+    <label class="file-input-btn">
+      Escolher arquivo CSV
+      <input type="file" accept=".csv" (change)="onBatchFileSelected($event)" class="file-input-btn__native" />
+    </label>
+    <p *ngIf="batchFileName" class="hint">Arquivo: {{ batchFileName }}</p>
+    <p *ngIf="batchLoading" class="hint">Calculando previsões...</p>
+    <p *ngIf="batchError" class="error">{{ batchError }}</p>
+
+    <div class="table-scroll" *ngIf="batchResults.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Probabilidade de malignidade</th>
+            <th>Orientação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of batchResults">
+            <td>{{ row.index + 1 }}</td>
+            <td>{{ row.result ? (row.result.probabilidade_malignidade * 100).toFixed(1) + '%' : '-' }}</td>
+            <td>
+              <span class="badge" [ngClass]="triageClass(row.result)">{{ row.result?.orientacao }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-container>
+
+<div class="card">
+  <h2>Relatório em PDF</h2>
+  <p class="hint">
+    Gera o mesmo PDF da seção 5.2 do notebook, com o status do CSV, distribuição de diagnósticos,
+    modelo selecionado, métricas e aviso clínico desta análise.
+  </p>
+  <button type="button" (click)="downloadPdf()" [disabled]="pdfLoading">
+    {{ pdfLoading ? 'Gerando PDF...' : 'Baixar relatório em PDF' }}
+  </button>
+  <p *ngIf="pdfError" class="error">{{ pdfError }}</p>
+</div>

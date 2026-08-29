@@ -1,0 +1,46 @@
+<div class="card">
+  <h2>Distribuição de diagnósticos</h2>
+  <p>Compara a quantidade de casos benignos e malignos, para identificar desbalanceamento de classes.</p>
+  <div style="max-width: 360px;">
+    <canvas baseChart [data]="distributionChartData" [options]="barOptions" type="bar"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Top 10 correlações com malignidade</h2>
+  <p>Correlação de Pearson entre cada atributo e o diagnóstico maligno. Não implica causalidade clínica.</p>
+  <canvas baseChart [data]="correlationChartData" [options]="horizontalBarOptions" type="bar"></canvas>
+</div>
+
+<div class="card">
+  <h2>Estatísticas descritivas</h2>
+  <p>Média, desvio padrão, mínimo, máximo e percentis de cada atributo numérico.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Atributo</th>
+          <th>Média</th>
+          <th>Desvio padrão</th>
+          <th>Mín</th>
+          <th>25%</th>
+          <th>50%</th>
+          <th>75%</th>
+          <th>Máx</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let feature of featureNames">
+          <td>{{ feature }}</td>
+          <td>{{ describeRow(feature).mean }}</td>
+          <td>{{ describeRow(feature).std }}</td>
+          <td>{{ describeRow(feature).min }}</td>
+          <td>{{ describeRow(feature)['25%'] }}</td>
+          <td>{{ describeRow(feature)['50%'] }}</td>
+          <td>{{ describeRow(feature)['75%'] }}</td>
+          <td>{{ describeRow(feature).max }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
